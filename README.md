@@ -18,7 +18,7 @@ An mp3 player with a web api to act as a door bell
 * Stop playing: `POST /api` body: `{"action": "stop"}`
 * Is playing?: `GET /api` param: `action=is_playing`
 
-### Docker image
+### Docker
 
 ```yaml
 version: '3'
