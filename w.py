@@ -9,15 +9,32 @@ class Server:
         self.port = port
         self.handlers = {}
         self.app = web.Application()
-        self.app.router.add_post('/api', self.handle)
+        self.app.router.add_get('/api', self.get_handle)
+        self.app.router.add_post('/api', self.post_handle)
 
     def on(self, action, handler):
         self.handlers[action] = handler
 
-    async def handle(self, req):
+    async def get_handle(self, req):
+        
+        if req.method != 'GET':
+            return web.Response(status=400)
+
+        code = 200
+        res = ''
+
+        if 'action' in req.query:
+            action = req.query['action']
+            handler = self.handlers[action]
+            code, res = await handler(action=action)
+        text= '{"result": %s}' % res
+        return web.Response(status=code, content_type='application/json', text=text)
+
+    async def post_handle(self, req):
 
         if req.method != 'POST':
-            return
+            return web.Response(status=400)
+
         code = 200
 
         if req.can_read_body:
@@ -26,7 +43,7 @@ class Server:
             filename = sanitize(data['name'])
             if action in self.handlers:
                 handler = self.handlers[action]
-                await handler(action=action, data={'file': filename})
+                code, res = await handler(action=action, data={'file': filename})
         else:
             code = 400
             print('bad request')

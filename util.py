@@ -14,3 +14,6 @@ def sanitize(s):
 
 def join(path, filename):
     return os.path.join(path, filename)
+
+def exists(filepath):
+    return os.path.isfile(filepath)

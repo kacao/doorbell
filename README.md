@@ -10,4 +10,11 @@ An mp3 player with a web api to act as a door bell
 
 ### Run
 
-* `pipenv run python3 main.py '*' 8080`
+* `pipenv run python3 main.py --host '*' --port 8080 --dir './media'`
+
+### Api
+
+* Play a media file: `POST /api` body: `{"action": "play", "file": "doorbell-1.mp3"}`
+* Stop playing: `POST /api` body: `{"action": "stop"}`
+* Is playing?: `GET /api` param: `action=is_playing`
+
