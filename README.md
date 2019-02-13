@@ -10,7 +10,7 @@ An mp3 player with a web api to act as a door bell
 
 ### Run
 
-* `pipenv run python3 main.py --host '*' --port 8080 --dir './media'`
+* `pipenv run python3 main.py --port 8080 --dir './media'`
 
 ### Api
 
