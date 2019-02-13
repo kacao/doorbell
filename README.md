@@ -1,5 +1,5 @@
-# mp3 player with a web api to act as a door bell
-
+# a door bell
+An mp3 player with a web api to act as a door bell
 ### Install:
 
 * [Python3](https://www.python.org/) 
