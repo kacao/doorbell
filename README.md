@@ -10,7 +10,7 @@ An mp3 player with a web api to act as a door bell
 
 ### Run
 
-* `pipenv run python3 main.py --port 8080 --dir './media'`
+* `pipenv run python3 main.py --host '*' --port 8080 --dir './media'`
 
 ### Api
 
@@ -18,3 +18,25 @@ An mp3 player with a web api to act as a door bell
 * Stop playing: `POST /api` body: `{"action": "stop"}`
 * Is playing?: `GET /api` param: `action=is_playing`
 
+### Docker image
+
+`
+version: '3'
+services:
+  doorbell:
+    container_name: doorbell
+    image: kacao/doorbell:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - ~/bells:/media
+      - /dev/snd:/dev/snd
+      - /dev/shm:/dev/shm
+      - /etc/machine-id:/etc/machine-id
+      - /var/lib/dbus:/var/lib/dbus
+    environment:
+      - HOST=*
+      - PORT=8080
+    network_mode: host
+    privileged: true
+`
