@@ -17,6 +17,7 @@ An mp3 player with a web api to act as a door bell
 * Play a media file: `POST /api/media/bell.mp3/play`
 * Stop playing: `POST /api/media/stop`
 * Is playing?: `GET /api/media/is_playing` response body: `{"result": true/false, "item": playing media file}`
+* Check if www service is alive: `GET /api/ping` returns `200`
 
 ### Docker image
 For raspberry pi, use `kacao/doorbell:rpi`

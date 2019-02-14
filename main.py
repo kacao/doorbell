@@ -48,8 +48,7 @@ class Main:
             return (200, '{"result": %s, "item": "%s"}' % (is_playing, item)) 
         else:
             return (404, '{"result": "not found"}') 
-
-
+    
     def get_path(self, item):
         return abspath(join(self.dir, item))
 

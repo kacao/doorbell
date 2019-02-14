@@ -15,6 +15,7 @@ class Server:
         self.get_handlers = {}
 
         routes = web.RouteTableDef()
+        self.app.router.add_get('/api/ping', self.handle_ping)
         self.app.router.add_get('/api/{entity}/{attr}', self.get_handle)
         self.app.router.add_post('/api/{entity}/{item}/{action}', self.post_handle)
 
@@ -26,8 +27,10 @@ class Server:
     def on_get(self, entity, handler):
         self.get_handlers[entity] = handler
 
+    async def handle_ping(self, req):
+        return web.Response(status=200)
+
     async def get_handle(self, req):
-        
         code = 200
         text = ''
         info = req.match_info
@@ -44,7 +47,6 @@ class Server:
         return web.Response(status=code, content_type='application/json', text=text)
 
     async def post_handle(self, req):
-
         code = 200
         text = ''
         info = req.match_info
