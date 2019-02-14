@@ -9,7 +9,7 @@ class Main:
     def __init__(self, host, port, media_path):
         self.media = Sound()
         self.loop = asyncio.get_event_loop()
-        self.server = Server(host, port, self.background_tasks)
+        self.server = Server(host, port, self.background_tasks, self.shutdown_tasks)
         self.dir = media_path
         self.server.on_post('media', 'play', self.handle_play)
         self.server.on_post('media', 'stop', self.handle_stop)
@@ -55,6 +55,9 @@ class Main:
 
     async def background_tasks(self, app):
         asyncio.ensure_future(self.media.background_check())
+
+    async def shutdown_tasks(self, app):
+        asyncio.ensure_future(self.media.on_shutdown())
 
     def run(self):
         self.server.run()

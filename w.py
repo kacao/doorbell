@@ -5,11 +5,12 @@ from util import abspath, sanitize
 
 class Server:
 
-    def __init__(self, host, port, background_tasks):
+    def __init__(self, host, port, background_tasks, shutdown_tasks):
         self.host = host
         self.port = port
         self.app = web.Application()
         self.app.on_startup.append(background_tasks)
+        self.app.on_cleanup.append(shutdown_tasks)
         self.post_handlers = {}
         self.get_handlers = {}
 
@@ -55,7 +56,6 @@ class Server:
             entity = sanitize(info['entity'])
             action = sanitize(info['action'])
             item = sanitize(info['item'])
-            print('doing %s/%s/%s' % (entity, action, item))
             if entity in self.post_handlers:
                 if action in self.post_handlers[entity]:
                     handler = self.post_handlers[entity][action]
