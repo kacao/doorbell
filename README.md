@@ -18,9 +18,9 @@ An mp3 player with a web api to act as a door bell
 * Stop playing: `POST /api/media/stop`
 * Is playing?: `GET /api/media/is_playing`
 
-### Docker image
-
-`
+### Docker
+For Raspberry Pi, use kacao/doorbell:rpi
+```yaml
 version: '3'
 services:
   doorbell:
@@ -38,4 +38,4 @@ services:
       - HOST=*
       - PORT=8080
     privileged: true
-`
+```
