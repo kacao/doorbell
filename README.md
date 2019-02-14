@@ -20,7 +20,7 @@ An mp3 player with a web api to act as a door bell
 
 ### Docker image
 
-`
+```yaml
 version: '3'
 services:
   doorbell:
@@ -38,4 +38,4 @@ services:
       - HOST=*
       - PORT=8080
     privileged: true
-`
+```
