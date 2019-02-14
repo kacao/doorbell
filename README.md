@@ -19,7 +19,7 @@ An mp3 player with a web api to act as a door bell
 * Is playing?: `GET /api/media/is_playing` response body: `{"result": true/false, "item": playing media file}`
 
 ### Docker image
-
+For raspberry pi, use `kacao/doorbell:rpi`
 ```yaml
 version: '3'
 services:
