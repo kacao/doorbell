@@ -14,9 +14,9 @@ An mp3 player with a web api to act as a door bell
 
 ### Api
 
-* Play a media file: `POST /api` body: `{"action": "play", "file": "doorbell-1.mp3"}`
-* Stop playing: `POST /api` body: `{"action": "stop"}`
-* Is playing?: `GET /api` param: `action=is_playing`
+* Play a media file: `POST /api/media/bell.mp3/play`
+* Stop playing: `POST /api/media/stop`
+* Is playing?: `GET /api/media/is_playing`
 
 ### Docker image
 
@@ -37,6 +37,5 @@ services:
     environment:
       - HOST=*
       - PORT=8080
-    network_mode: host
     privileged: true
 `
