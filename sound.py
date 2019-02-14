@@ -1,27 +1,71 @@
 import vlc
+from vlc import *
 import time
+import asyncio
+import ctypes
 
 class Sound:
 
     def __init__(self):
-        self.instances = {}
+        self.players = {}
         self.playing_instance = None
+        self.playing_file = ''
+        self.vlc_instance = vlc.Instance()
+        self.should_stop_checking = False
 
-    async def play(self, filename):
-        if self.playing_instance:
-            self.playing_instance.stop()
-        if filename not in self.instances:
-            self.instances[filename] = vlc.MediaPlayer("file://" + filename)
-        p = self.instances[filename]
-        self.playing_instance = p
-        p.play()
-        return p
+        self.playing_instance = {
+            'filepath': '',
+            'should_stop': False,
+            'player': None,
+            'length': -1
+        }
+
+    # check for finished play and call player.stop()
+    async def background_check(self):
+        while self.should_stop_checking == False:
+            if self.playing_instance['should_stop'] == True:
+                await self._stop()
+            await asyncio.sleep(.5)
+
+    async def _stop(self):
+        self.playing_instance['should_stop'] = False
+        self.playing_instance['player'].stop()
+        self.playing_instance['filepath'] = ''
+        self.playing_instance['player'] = None
+
+    async def play(self, filepath):
+        # something is playing, ignore
+        if self.playing_instance['player']:
+            return()
+
+        if filepath not in self.players:
+            media = self.vlc_instance.media_new_path(filepath)
+            p = self.vlc_instance.media_player_new()
+            p.set_media(media)
+            self.players[filepath] = p
+        
+        player = self.players[filepath]
+        self.playing_instance['player'] = player
+        self.playing_instance['filepath'] = filepath
+        self.playing_instance['should_stop'] = False
+
+        events = player.event_manager()
+        events.event_attach(vlc.EventType.MediaPlayerEndReached, self._sound_finished)
+        events.event_attach(vlc.EventType.MediaPlayerPlaying, self._sound_playing)
+        player.play()
+
+    def _sound_finished(self, data):
+        self.playing_instance['should_stop'] = True
+
+    def _sound_playing(self, data):
+        print('playing %s ms' % self.playing_instance['player'].get_length())
 
     async def stop(self):
-        p = self.playing_instance
-        if p and p.is_playing():
-            p.stop()
-            self.playing_instance = None
+        if self.playing_instance['player']:
+            await self._stop()
 
     async def is_playing(self):
-        return self.playing_instance != None
+        if self.playing_instance:
+            return (True, self.playing_file)
+        else:
+            return (False, '')

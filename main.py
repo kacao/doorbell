@@ -2,46 +2,59 @@ from util import abspath, join, exists
 from w import Server
 from sound import Sound
 import sys, getopt
+import asyncio, time
 
 class Main:
 
     def __init__(self, host, port, media_path):
         self.media = Sound()
-        self.server = Server(host, port)
+        self.loop = asyncio.get_event_loop()
+        self.server = Server(host, port, self.background_tasks)
         self.dir = media_path
-        self.server.on('play', self.handle_play)
-        self.server.on('stop', self.handle_stop)
-        self.server.on('is_playing', self.handle_is_playing)
+        self.server.on_post('media', 'play', self.handle_play)
+        self.server.on_post('media', 'stop', self.handle_stop)
+        self.server.on_get('media', self.handle_get_media)
 
-    async def handle_play(self, action, data):
-        filepath = self.get_path(data)
+    async def handle_play(self, entity, item, action, data):
+        print('handling play')
+        filepath = self.get_path(item)
+        print('file path: %s' % filepath)
         code = 200
         if not exists(filepath):
             print('media not found: %s' % filepath)
             code = 404
         else:
-            print('playing %s' % data['file'])
-            await self.media.play(filepath)
+            print('playing %s' % item)
+            if self.media.playing_file != filepath:
+                await self.media.play(filepath)
         return (code, None)
 
-    async def handle_stop(self, action, data):
-        filepath = self.get_path(data)
+    async def handle_stop(self, entity, item, action, data):
+        filepath = self.get_path(item)
         code = 200
         if not exists(filepath):
             print('media not found: %s' % filepath)
             code = 404
         else:
-            print('stopping %s' % data['file'])
+            print('stopping %s' % item)
             await self.media.stop()
         return (code, None)
 
-    async def handle_is_playing(self, action):
-        return (200, str(await self.media.is_playing()).lower())
+    async def handle_get_media(self, entity, attr, data):
+        # tiny bug, file names get case lowered
+        if attr == 'is_playing':
+            is_playing, item = await self.media.is_playing()
+            is_playing = str(is_playing).lower()
+            return (200, '{"result": %s, "item": "%s"}' % (is_playing, item)) 
+        else:
+            return (404, '{"result": "not found"}') 
 
 
-    def get_path(self, data):
-        filename = data['file']
-        return abspath(join(self.dir, filename))
+    def get_path(self, item):
+        return abspath(join(self.dir, item))
+
+    async def background_tasks(self, app):
+        asyncio.ensure_future(self.media.background_check())
 
     def run(self):
         self.server.run()
