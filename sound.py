@@ -11,6 +11,13 @@ class Sound:
         self.playing_instance = None
         self.playing_file = ''
         self.vlc_instance = vlc.Instance('--aout=bluealsa')
+        outputs = self.vlc_instance.audio_output_list_get()
+        for output in outputs:
+            if output:
+                if output.name:
+                    print(output.name)
+                else:
+                    print('no name')
         self.should_stop_checking = False
 
         self.playing_instance = {
