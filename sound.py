@@ -63,7 +63,7 @@ class Sound:
         if filepath not in self.players:
             media = self.vlc_instance.media_new_path(filepath)
             p = self.vlc_instance.media_player_new()
-            p.audio_output_set(self.outputs[0].name)
+            p.audio_output_set(self.outputs[1].name)
             devices = []
             modules = p.audio_output_device_enum()
             if modules:
