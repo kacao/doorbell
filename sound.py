@@ -10,15 +10,21 @@ class Sound:
         self.players = {}
         self.playing_instance = None
         self.playing_file = ''
-        self.vlc_instance = vlc.Instance('--aout=bluealsa')
-        outputs = self.vlc_instance.audio_output_list_get()
-        for output in outputs:
-            if output:
-                if output.name:
-                    print(output.name)
-                else:
-                    print('no name')
+        #self.vlc_instance = vlc.Instance('--verbose 9')
+        self.vlc_instance = vlc.Instance()
         self.should_stop_checking = False
+        self.outputs = []
+        outputs = self.vlc_instance.audio_output_list_get()
+        if outputs:
+            output = outputs
+            while output:
+                output = output.contents
+                self.outputs.append(output)
+                print(str(output.description))
+                output = output.next
+
+        
+        vlc.libvlc_audio_output_list_release(outputs)
 
         self.playing_instance = {
             'filepath': '',
@@ -57,6 +63,17 @@ class Sound:
         if filepath not in self.players:
             media = self.vlc_instance.media_new_path(filepath)
             p = self.vlc_instance.media_player_new()
+            p.audio_output_set(self.outputs[0].name)
+            devices = []
+            modules = p.audio_output_device_enum()
+            if modules:
+                device = modules
+                while device:
+                    device = device.contents
+                    devices.append(device.device)
+                    print(device.device)
+                    device = device.next
+            vlc.libvlc_audio_output_device_list_release(modules)
             p.set_media(media)
             self.players[filepath] = p
         
