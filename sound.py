@@ -10,7 +10,7 @@ class Sound:
         self.players = {}
         self.playing_instance = None
         self.playing_file = ''
-        self.vlc_instance = vlc.Instance()
+        self.vlc_instance = vlc.Instance('--aout=bluealsa')
         self.should_stop_checking = False
 
         self.playing_instance = {
