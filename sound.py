@@ -10,7 +10,7 @@ class Sound:
         self.players = {}
         self.playing_instance = None
         self.playing_file = ''
-        #self.vlc_instance = vlc.Instance('--verbose 9')
+        self.vlc_instance = vlc.Instance('--verbose 9')
         self.vlc_instance = vlc.Instance()
         self.should_stop_checking = False
         self.outputs = []
@@ -19,8 +19,7 @@ class Sound:
             output = outputs
             while output:
                 output = output.contents
-                self.outputs.append(output)
-                print(str(output.description))
+                self.outputs.append(output.name)
                 output = output.next
 
         
@@ -63,17 +62,25 @@ class Sound:
         if filepath not in self.players:
             media = self.vlc_instance.media_new_path(filepath)
             p = self.vlc_instance.media_player_new()
-            p.audio_output_set(self.outputs[1].name)
+
+            for output in self.outputs:
+                print(output)
+            p.audio_output_set(self.outputs[1])
             devices = []
+            print('before enum')
+
             modules = p.audio_output_device_enum()
             if modules:
                 device = modules
                 while device:
                     device = device.contents
                     devices.append(device.device)
-                    print(device.device)
                     device = device.next
+            for device in devices:
+                print(device)
             vlc.libvlc_audio_output_device_list_release(modules)
+            print('after lrease')
+            p.audio_output_device_set(None, devices[0])
             p.set_media(media)
             self.players[filepath] = p
         
