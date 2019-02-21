@@ -80,7 +80,7 @@ class Sound:
                 print(device)
             vlc.libvlc_audio_output_device_list_release(modules)
             print('after lrease')
-            p.audio_output_device_set(None, devices[0])
+            p.audio_output_device_set(None, devices[1])
             p.set_media(media)
             self.players[filepath] = p
         
